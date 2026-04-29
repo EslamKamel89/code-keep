@@ -1,90 +1,97 @@
-# CodeKeep — Full Engineering Specification (AI-Agent Optimized)
+# CodeKeep — Authoritative Product & Engineering Specification
 
 ---
 
-## 1. Core Problem
+## 1. Product Definition
 
-Developers store critical knowledge across fragmented systems:
+CodeKeep is a developer-centric knowledge management system that unifies:
 
-- Code snippets in editors or note tools
-- AI prompts inside chat sessions
-- Context files inside repositories
-- Links in bookmarks
-- Commands in terminal history
-- Templates in gists
+- Code snippets
+- AI prompts
+- Notes
+- Commands
+- Links
+- Files & images
 
-This leads to:
+into a single, fast, searchable, and structured workspace.
 
-- High context switching
-- Loss of reusable knowledge
-- Slower development cycles
-
-**CodeKeep provides a unified, structured, and AI-enhanced knowledge system optimized for fast input and retrieval.**
+The system is designed to minimize context switching, preserve reusable knowledge, and enable rapid retrieval.
 
 ---
 
-## 2. Product Goals
+## 2. Core Principles
 
-### Primary Goals
-
-- Ultra-fast capture of developer knowledge
-- Powerful retrieval via search + filters
-- Flexible organization (collections + tags)
-- AI-assisted enrichment (optional)
-
-### Secondary Goals
-
-- Scalable data model
-- Clean developer UX
-- Extensible architecture for future features
+- **Speed-first UX** (capture and retrieval must be instant)
+- **Context preservation** (no full-page navigation for core actions)
+- **Flexible organization** (collections are not type-restricted)
+- **AI-augmented, not AI-dependent**
+- **Strong ownership & isolation per user**
 
 ---
 
-## 3. System Architecture
+## 3. Core Concepts
 
-### 3.1 High-Level Architecture
+### 3.1 Item
 
-- Monorepo (Next.js fullstack)
-- API layer inside `/app/api`
-- Service layer abstraction (domain-based)
-- Prisma ORM for DB access
-- External services:
-  - OpenAI (AI features)
-  - Cloudflare R2 (file storage)
-  - Stripe (billing)
+The atomic unit of knowledge.
 
----
+An item can represent:
 
-## 4. Core Domain Design
-
----
-
-## 4.1 Entities Overview
-
-| Entity                 | Purpose                             |
-| ---------------------- | ----------------------------------- |
-| User                   | Auth + ownership                    |
-| Account                | OAuth accounts                      |
-| Session                | Auth sessions                       |
-| VerificationToken      | Auth flows                          |
-| Item                   | Core knowledge unit                 |
-| ItemType               | Defines item behavior               |
-| Collection             | Logical grouping                    |
-| ItemCollection         | Many-to-many pivot                  |
-| Tag                    | Labeling system                     |
-| ItemTag                | Many-to-many pivot                  |
-| UsageLog               | Track usage (future AI + analytics) |
-| SearchIndex (optional) | Optimized search                    |
-| Subscription           | Billing state                       |
-| FileAsset              | File metadata abstraction           |
+- Code snippet
+- Prompt
+- Note
+- Command
+- Link
+- File
+- Image
 
 ---
 
-## 5. Database Schema (Prisma-Level Detail)
+### 3.2 Item Type
+
+Defines behavior, color, and icon.
+
+#### System Types (immutable)
+
+| Type    | Color   | Icon       |
+| ------- | ------- | ---------- |
+| snippet | #3b82f6 | Code       |
+| prompt  | #8b5cf6 | Sparkles   |
+| command | #f97316 | Terminal   |
+| note    | #fde047 | StickyNote |
+| file    | #6b7280 | File       |
+| image   | #ec4899 | Image      |
+| link    | #10b981 | Link       |
 
 ---
 
-## 5.1 Auth Models (NextAuth Required)
+### 3.3 Collection
+
+A flexible container of items.
+
+**Important Rule:**
+
+- A collection can contain **multiple item types simultaneously**
+
+---
+
+### 3.4 Tag
+
+A lightweight labeling system used for filtering and organization.
+
+---
+
+### 3.5 Relationships
+
+- Item ↔ Collection → many-to-many
+- Item ↔ Tag → many-to-many
+- Item → ItemType → many-to-one
+
+---
+
+## 4. Database Schema (Prisma)
+
+### 4.1 Auth Models (NextAuth)
 
 ```prisma
 model User {
@@ -109,30 +116,19 @@ model User {
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 }
-```
 
-```prisma
 model Account {
   id                String  @id @default(cuid())
   userId            String
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
-```
 
-```prisma
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
@@ -141,9 +137,7 @@ model Session {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
-```
 
-```prisma
 model VerificationToken {
   identifier String
   token      String   @unique
@@ -155,9 +149,7 @@ model VerificationToken {
 
 ---
 
-## 5.2 Core Models
-
-### Item
+### 4.2 Core Models
 
 ```prisma
 model Item {
@@ -193,36 +185,22 @@ model Item {
   @@index([itemTypeId])
   @@index([title])
 }
-```
 
----
-
-### ItemType
-
-```prisma
 model ItemType {
   id        String   @id @default(cuid())
   name      String
   icon      String
   color     String
-
   isSystem  Boolean  @default(false)
 
   userId    String?
 
   user      User? @relation(fields: [userId], references: [id])
-
   items     Item[]
 
   @@unique([name, userId])
 }
-```
 
----
-
-### Collection
-
-```prisma
 model Collection {
   id            String   @id @default(cuid())
 
@@ -240,16 +218,8 @@ model Collection {
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-
-  @@index([userId])
 }
-```
 
----
-
-### ItemCollection (Pivot)
-
-```prisma
 model ItemCollection {
   itemId       String
   collectionId String
@@ -261,13 +231,7 @@ model ItemCollection {
 
   @@id([itemId, collectionId])
 }
-```
 
----
-
-### Tag
-
-```prisma
 model Tag {
   id      String @id @default(cuid())
   name    String
@@ -279,13 +243,7 @@ model Tag {
 
   @@unique([name, userId])
 }
-```
 
----
-
-### ItemTag (Pivot)
-
-```prisma
 model ItemTag {
   itemId String
   tagId  String
@@ -295,13 +253,7 @@ model ItemTag {
 
   @@id([itemId, tagId])
 }
-```
 
----
-
-### FileAsset
-
-```prisma
 model FileAsset {
   id        String @id @default(cuid())
 
@@ -312,16 +264,8 @@ model FileAsset {
 
   itemId    String @unique
   item      Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
 }
-```
 
----
-
-### Subscription
-
-```prisma
 model Subscription {
   id        String @id @default(cuid())
 
@@ -332,33 +276,12 @@ model Subscription {
   plan      String
 
   currentPeriodEnd DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 ```
 
 ---
 
-### UsageLog (Future AI + Analytics)
-
-```prisma
-model UsageLog {
-  id        String @id @default(cuid())
-
-  userId    String
-  action    String
-  metadata  Json?
-
-  createdAt DateTime @default(now())
-
-  @@index([userId])
-}
-```
-
----
-
-## 6. Enums
+### 4.3 Enums
 
 ```prisma
 enum ContentType {
@@ -370,9 +293,156 @@ enum ContentType {
 
 ---
 
-## 7. API Design (Agent-Oriented)
+## 5. UI Architecture
 
-### Item APIs
+### 5.1 Layout
+
+- Sidebar (navigation + filters)
+- Topbar (search + actions)
+- Main content:
+  - Collections grid
+  - Pinned items
+  - Items list/grid
+
+- Drawer (item view/edit)
+
+---
+
+### 5.2 Core UI Sections
+
+#### Sidebar
+
+- Item types (with counts)
+- Favorite collections
+- All collections
+- User profile
+
+---
+
+#### Topbar
+
+- Global search
+- Quick actions:
+  - New Collection
+  - New Item
+
+- Command hint (⌘K)
+
+---
+
+#### Collections Grid
+
+Each card includes:
+
+- Name
+- Description
+- Item count
+- Favorite state
+- Type indicators (multi-type)
+- Context menu
+
+---
+
+#### Pinned Section
+
+- Displays all pinned items globally
+- Not tied to a single collection
+
+---
+
+#### Items View
+
+Each item shows:
+
+- Title
+- Description
+- Tags
+- Type
+- Date
+- Favorite / Pin state
+
+---
+
+#### Drawer (Critical Component)
+
+Used for:
+
+- Viewing
+- Editing
+- Managing items
+
+Includes:
+
+- Title
+- Type badge
+- Language badge
+- Actions:
+  - Favorite
+  - Pin
+  - Copy
+  - Edit
+  - Delete
+
+- Content (code/text/link)
+- Tags
+- Collections
+- Metadata (createdAt, updatedAt)
+
+---
+
+## 6. Features
+
+### 6.1 Item Features
+
+- Create / edit / delete
+- Multi-collection assignment
+- Tagging
+- Favorite & pin
+- Markdown support
+- File upload (Pro)
+
+---
+
+### 6.2 Collection Features
+
+- Create / edit / delete
+- Favorite collections
+- Multi-type support
+
+---
+
+### 6.3 Search & Filtering
+
+- Search by title/content
+- Filter by:
+  - Type
+  - Tag
+  - Collection
+  - Favorites
+
+---
+
+### 6.4 AI Features (Pro)
+
+- Auto-tagging
+- Summarization
+- Code explanation
+- Prompt optimization
+
+---
+
+### 6.5 Additional Features
+
+- Recently used items
+- Export (JSON/ZIP)
+- Syntax highlighting
+- Dark mode
+
+---
+
+## 7. API Design
+
+### Items
 
 ```
 POST   /api/items
@@ -382,7 +452,7 @@ PATCH  /api/items/:id
 DELETE /api/items/:id
 ```
 
-### Collection APIs
+### Collections
 
 ```
 POST   /api/collections
@@ -391,14 +461,14 @@ PATCH  /api/collections/:id
 DELETE /api/collections/:id
 ```
 
-### Tag APIs
+### Tags
 
 ```
 POST   /api/tags
 GET    /api/tags
 ```
 
-### Search API
+### Search
 
 ```
 GET /api/search?q=&type=&tag=&collection=
@@ -406,136 +476,57 @@ GET /api/search?q=&type=&tag=&collection=
 
 ---
 
-## 8. AI System Design
-
-### AI Capabilities
-
-- Tag generation
-- Summarization
-- Code explanation
-- Prompt optimization
-
-### AI Service Layer
-
-```
-/services/ai/
-  - generateTags()
-  - summarize()
-  - explainCode()
-  - optimizePrompt()
-```
-
-### Constraints
-
-- Only available for Pro users
-- Rate limiting required
-- Log usage in `UsageLog`
-
----
-
-## 9. Search System
-
-### Phase 1
-
-- SQL-based search (`ILIKE`)
-- Indexed columns:
-  - title
-  - content
-
-### Phase 2 (Optional)
-
-- Full-text search
-- Dedicated search index table
-
----
-
-## 10. File Handling
-
-### Upload Flow
-
-1. Client requests signed URL
-2. Upload to Cloudflare R2
-3. Store metadata in `FileAsset`
-
-### Constraints
-
-- Only Pro users
-- File size limits enforced
-
----
-
-## 11. Permissions & Access Control
-
-### Rules
+## 8. System Behavior Rules
 
 - All data is user-scoped
 - No cross-user access
-- Middleware must enforce:
-  - Authenticated user
-  - Ownership checks
+- Drawer is primary interaction surface
+- No page navigation for item viewing
+- Collections must support mixed item types
+- Pinned items are global
+- Favorites affect sidebar visibility
 
 ---
 
-## 12. Monetization Enforcement
+## 9. Monetization
 
-### Free Tier Limits
+### Free
 
-- Max 50 items
-- Max 3 collections
+- 50 items
+- 3 collections
+- No files/images
+- No AI
 
-### Enforcement Points
+### Pro
 
-- API layer validation
-- Middleware guard
-
----
-
-## 13. UI Behavior Contracts (Important for Agents)
-
-### Item Creation
-
-- Must support quick-create (drawer)
-- Minimal required fields:
-  - title
-  - type
-
-### Item Editing
-
-- Inline editing preferred
-- Autosave (future)
-
-### Navigation
-
-- `/items/{type}`
-- `/collections/{id}`
+- Unlimited items
+- Unlimited collections
+- File/image uploads
+- AI features
+- Export
+- Priority support
 
 ---
 
-## 14. Performance Considerations
+## 10. Performance Requirements
 
-- Use pagination on all list endpoints
-- Use indexes on:
-  - userId
-  - title
-  - createdAt
-
-- Lazy load heavy content
-- Cache frequently accessed items (optional Redis)
+- Indexed queries (userId, title)
+- Pagination on list endpoints
+- Lazy loading for content
+- Optional Redis caching
 
 ---
 
-## 15. Development Rules
+## 11. Development Constraints
 
-- Use Prisma migrations only (no db push)
-- Strict typing across all layers
-- Service layer must isolate business logic
-- No direct DB access in API routes
+- Prisma migrations only (no db push)
+- Service-layer architecture required
+- Strict TypeScript usage
+- No direct DB access in controllers
 
 ---
 
-## 16. Seed Data (Required)
-
-System Item Types:
+## 12. Seed Data
 
 ```json
 [
@@ -566,19 +557,193 @@ System Item Types:
 
 ---
 
-## 17. Summary
+## 13. UI Design (Authoritative Reference)
 
-CodeKeep is a structured developer knowledge system built around:
+The UI implementation **must strictly follow the provided visual mockups**, which serve as the single source of truth for layout, spacing, hierarchy, and interaction patterns.
 
-- A flexible relational model (items, collections, tags)
-- Strong ownership and access control
+### 13.1 Design References
+
+The following screenshots define the dashboard experience:
+
+- `@context/screenshots/dashboard-ui-main.png` → **Main Dashboard Layout**
+- `@context/screenshots/dashboard-ui-drawer.png` → **Item Drawer (Detail View)**
+
+These are not optional references — they are **authoritative design specifications**.
+
+---
+
+### 13.2 Scope of Responsibility
+
+The screenshots define:
+
+- Layout structure (sidebar, topbar, content, drawer)
+- Component hierarchy
+- Spacing, alignment, and proportions
+- Visual states (hover, active, selected)
+- Color usage and emphasis
+- Information density and grouping
+- Interaction patterns (especially drawer behavior)
+
+---
+
+### 13.3 Main Dashboard Requirements
+
+From `dashboard-ui-main.png`, the implementation must include:
+
+#### Layout
+
+- Persistent left sidebar
+- Top navigation bar with search and actions
+- Main scrollable content area
+
+#### Sidebar
+
+- Item types with counts
+- Collections grouped into:
+  - Favorites
+  - All Collections
+
+- Active/selected states
+- User profile section at bottom
+
+#### Topbar
+
+- Search input with shortcut hint (⌘K style)
+- Action buttons:
+  - New Collection
+  - New Item
+
+#### Collections Section
+
+- Responsive grid layout
+- Each collection card must include:
+  - Title
+  - Item count
+  - Description
+  - Favorite indicator (if applicable)
+  - Type indicators (multiple types allowed)
+  - Context menu (⋯)
+
+- Border color reflects dominant type (based on item types inside)
+
+#### Pinned Section (Required)
+
+- Separate section below collections
+- Displays pinned items globally
+- Not scoped to a single collection
+
+#### Item Cards
+
+- Must display:
+  - Title
+  - Description
+  - Tags
+  - Type indicator
+  - Date (optional but visible in design)
+
+- Visual emphasis on hover
+
+---
+
+### 13.4 Drawer Requirements
+
+From `dashboard-ui-drawer.png`, the implementation must include:
+
+#### Behavior
+
+- Slides from the right
+- Does NOT navigate away from dashboard
+- Overlay with backdrop
+- Supports click outside to close
+
+#### Header
+
+- Item title
+- Type badge
+- Language badge (if applicable)
+- Action buttons:
+  - Favorite
+  - Pin
+  - Copy
+  - Edit
+  - Delete
+
+#### Content Sections
+
+Must be structured exactly as:
+
+1. Description
+2. Content (code/text/link)
+   - Syntax highlighting for code
+
+3. Tags (as chips)
+4. Collections (multi-collection membership)
+5. Metadata:
+   - Created date
+   - Updated date
+
+---
+
+### 13.5 Critical UI Rules
+
+- **Drawer-first interaction model**
+  → Items are never opened via full page navigation
+
+- **Collections support mixed item types**
+  → UI must visually reflect multiple types per collection
+
+- **Color system must match item types**
+  → Colors defined in spec must be used consistently
+
+- **High information density without clutter**
+  → Follow spacing and grouping from screenshots precisely
+
+- **Dark mode is default**
+  → Light mode is optional and not required for initial implementation
+
+---
+
+### 13.6 Responsiveness
+
+- Desktop-first design (primary target)
+- Tablet: reduced grid columns
+- Mobile:
+  - Sidebar becomes drawer
+  - Drawer becomes full-screen
+
+---
+
+### 13.7 Implementation Constraint
+
+If any ambiguity exists between:
+
+- Written spec
+- UI screenshots
+
+👉 **The screenshots take priority for UI behavior and structure.**
+
+---
+
+### 13.8 Summary
+
+The two screenshots collectively define:
+
+- The **complete dashboard experience**
+- The **core interaction model (drawer-based)**
+- The **visual system and hierarchy**
+
+They must be treated as **pixel-accurate references**, not inspiration.
+
+---
+
+## 14. Final Summary
+
+CodeKeep is a **context-preserving developer system** built on:
+
+- Flexible relational data modeling
+- Drawer-first UX
+- Multi-type collections
+- Fast search and retrieval
 - AI-augmented workflows
-- Scalable architecture with Prisma and Next.js
 
-This specification ensures that an AI coding agent can:
-
-- Understand domain boundaries
-- Generate correct database schema
-- Implement APIs consistently
-- Enforce business rules
-- Extend the system safely
+This specification is the **single source of truth** for implementation across backend, frontend, and AI agents.

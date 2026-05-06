@@ -1,35 +1,22 @@
-"use client";
-
-import { useState } from "react";
-import { Sidebar } from "@/components/dashboard/Sidebar";
-import { Topbar } from "@/components/dashboard/Topbar";
+import { DashboardShell } from "@/components/dashboard/DashboardShell";
+import { StatsCards } from "@/components/dashboard/StatsCards";
+import { CollectionsGrid } from "@/components/dashboard/CollectionsGrid";
+import { PinnedItems } from "@/components/dashboard/PinnedItems";
+import { RecentItems } from "@/components/dashboard/RecentItems";
 
 export default function DashboardPage() {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-
   return (
-    <div className="flex h-screen overflow-hidden">
-      {mobileSidebarOpen && (
-        <div
-          className="fixed inset-0 z-20 bg-black/50 md:hidden"
-          onClick={() => setMobileSidebarOpen(false)}
-        />
-      )}
-
-      <Sidebar
-        collapsed={sidebarCollapsed}
-        onToggleCollapse={() => setSidebarCollapsed((p) => !p)}
-        mobileOpen={mobileSidebarOpen}
-        onMobileClose={() => setMobileSidebarOpen(false)}
-      />
-
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <Topbar onMobileSidebarToggle={() => setMobileSidebarOpen((p) => !p)} />
-        <main className="flex-1 overflow-y-auto p-6">
-          <h2 className="text-lg font-semibold">Main</h2>
-        </main>
+    <DashboardShell>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Your developer knowledge hub</p>
       </div>
-    </div>
+      <div className="space-y-8">
+        <StatsCards />
+        <CollectionsGrid />
+        <PinnedItems />
+        <RecentItems />
+      </div>
+    </DashboardShell>
   );
 }

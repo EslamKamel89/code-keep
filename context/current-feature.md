@@ -18,3 +18,5 @@
 - 2026-05-06: Database implementation completed — Prisma 7 + Neon PostgreSQL, full schema migrated, 7 system ItemTypes seeded, PrismaNeon adapter configured, test script verified
 - 2026-05-09: Seed data expansion started — demo user + full collections/items per seed-spec.md
 - 2026-05-09: Seed data expansion completed — bcryptjs added, User.password field migrated, truncate-before-seed, demo user + 5 collections + 14 items seeded successfully
+- 2026-05-09: Dashboard collections real data started — replace mock collections with Prisma DB queries, border color from dominant type, type icons per collection
+- 2026-05-09: Dashboard collections real data completed — src/lib/db/collections.ts created, CollectionsGrid made async server component, CollectionCard updated with dominant-type border color and live type icons, build passing

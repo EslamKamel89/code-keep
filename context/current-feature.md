@@ -2,25 +2,9 @@
 
 ## Status
 
-In Progress
-
 ## Goals
 
-- Install Prisma 7 and `@prisma/client`; configure for Neon PostgreSQL (serverless driver)
-- Create `prisma/schema.prisma` with all models from project-overview.md:
-  - Auth models: `User`, `Account`, `Session`, `VerificationToken`
-  - Core models: `Item`, `ItemType`, `Collection`, `ItemCollection`, `Tag`, `ItemTag`, `FileAsset`, `Subscription`
-  - Enum: `ContentType`
-- Add all indexes (`@@index`) and cascade deletes as specified in schema
-- Run `prisma migrate dev --name init` to generate the initial migration
-- Seed system `ItemType` records (snippet, prompt, command, note, file, image, link)
-
 ## Notes
-
-- Prisma 7 has breaking changes — read the full upgrade guide before writing any code
-- `DATABASE_URL` points to the Neon **development** branch; production branch is separate
-- Always use `prisma migrate dev` (never `db push`) per project coding standards
-- Use `prisma migrate deploy` in production before app starts
 
 ## history
 
@@ -31,3 +15,6 @@ In Progress
 - 2026-05-06: Dashboard UI Phase 3 started — main content area with stats cards, recent collections, pinned items, and recent items using mock data
 - 2026-05-06: Dashboard UI Phase 3 completed — stats cards, collections grid with type indicators, pinned items, recent items, DashboardShell pattern for server-component page.tsx, mobile responsiveness fixed
 - 2026-05-06: Database implementation started — Prisma 7 + Neon PostgreSQL setup with full schema and initial migration
+- 2026-05-06: Database implementation completed — Prisma 7 + Neon PostgreSQL, full schema migrated, 7 system ItemTypes seeded, PrismaNeon adapter configured, test script verified
+- 2026-05-09: Seed data expansion started — demo user + full collections/items per seed-spec.md
+- 2026-05-09: Seed data expansion completed — bcryptjs added, User.password field migrated, truncate-before-seed, demo user + 5 collections + 14 items seeded successfully

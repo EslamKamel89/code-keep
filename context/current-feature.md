@@ -2,9 +2,21 @@
 
 ## Status
 
+Completed
+
 ## Goals
 
+- Display stats (total items, collections, item types, tags) from the database instead of mock data
+- Display system item types in the sidebar with their icons, each linking to `/items/[typename]`
+- Add a "View all collections" link under the collections list in the sidebar pointing to `/collections`
+- Favorite collections keep their star icons; recent collections show a colored circle based on the most-used item type in that collection
+- Add any missing DB query functions to `src/lib/db/items.ts` (using `src/lib/db/collections.ts` as reference)
+
 ## Notes
+
+- Spec file: `context/features/stats-sidebar-spec.md`
+- Item types are seeded system types; use their `color` field for the colored circles in recent collections
+- Keep existing design/layout — data source changes only, no UI redesign
 
 ## history
 
@@ -22,3 +34,5 @@
 - 2026-05-09: Dashboard collections real data completed — src/lib/db/collections.ts created, CollectionsGrid made async server component, CollectionCard updated with dominant-type border color and live type icons, build passing
 - 2026-05-13: Dashboard items real data started — replace mock pinned/recent items with Prisma DB queries, item card icon/border from item type, update collection stats
 - 2026-05-13: Dashboard items real data completed — src/lib/db/items.ts created, PinnedItems/RecentItems/StatsCards made async server components, ItemCard updated to use live itemType relation and DB tags, mock data removed from all item components, build passing
+- 2026-05-13: Stats & sidebar real data started — replace mock stats with DB queries, sidebar item types from DB with icon links, colored circles for recent collections based on dominant type, "View all collections" link
+- 2026-05-13: Stats & sidebar real data completed — src/lib/db/sidebar.ts created, getSidebarItemTypes/getSidebarCollections added, Sidebar migrated from mock data to DB props via DashboardShell, colored dots for all collections, "View all collections" link, build passing

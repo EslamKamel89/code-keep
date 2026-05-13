@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
+import type { SidebarData } from "@/src/lib/db/sidebar";
 
 interface DashboardShellProps {
   children: React.ReactNode;
+  sidebarData: SidebarData;
 }
 
-export function DashboardShell({ children }: DashboardShellProps) {
+export function DashboardShell({ children, sidebarData }: DashboardShellProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
@@ -25,6 +27,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
         onToggleCollapse={() => setSidebarCollapsed((p) => !p)}
         mobileOpen={mobileSidebarOpen}
         onMobileClose={() => setMobileSidebarOpen(false)}
+        sidebarData={sidebarData}
       />
       <div className="flex flex-1 flex-col overflow-hidden">
         <Topbar onMobileSidebarToggle={() => setMobileSidebarOpen((p) => !p)} />

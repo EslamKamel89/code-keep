@@ -17,7 +17,8 @@ import {
   Settings,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { mockItemTypes, mockItems, mockCollections, mockUser } from "@/lib/mock-data";
+import { mockUser } from "@/lib/mock-data";
+import type { SidebarData } from "@/src/lib/db/sidebar";
 import { cn } from "@/lib/utils";
 
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -35,18 +36,14 @@ interface SidebarProps {
   onToggleCollapse: () => void;
   mobileOpen: boolean;
   onMobileClose: () => void;
+  sidebarData: SidebarData;
 }
 
-export function Sidebar({ collapsed, onToggleCollapse, mobileOpen, onMobileClose }: SidebarProps) {
+export function Sidebar({ collapsed, onToggleCollapse, mobileOpen, onMobileClose, sidebarData }: SidebarProps) {
   const [typesExpanded, setTypesExpanded] = useState(true);
   const [collectionsExpanded, setCollectionsExpanded] = useState(true);
 
-  const typeCounts = mockItemTypes.reduce<Record<string, number>>((acc, type) => {
-    acc[type.id] = mockItems.filter((item) => item.itemTypeId === type.id).length;
-    return acc;
-  }, {});
-
-  const favoriteCollections = mockCollections.filter((c) => c.isFavorite);
+  const favoriteCollections = sidebarData.collections.filter((c) => c.isFavorite);
 
   return (
     <aside
@@ -76,12 +73,15 @@ export function Sidebar({ collapsed, onToggleCollapse, mobileOpen, onMobileClose
           </Link>
         )}
         <button
+          type="button"
           onClick={onToggleCollapse}
           className="hidden md:flex size-7 items-center justify-center rounded-md text-muted-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors shrink-0"
         >
           {collapsed ? <ChevronRight className="size-4" /> : <ChevronLeft className="size-4" />}
         </button>
         <button
+          type="button"
+          aria-label="Close sidebar"
           onClick={onMobileClose}
           className="md:hidden size-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-sidebar-foreground shrink-0"
         >
@@ -95,6 +95,7 @@ export function Sidebar({ collapsed, onToggleCollapse, mobileOpen, onMobileClose
         <div className="px-3">
           {!collapsed && (
             <button
+              type="button"
               onClick={() => setTypesExpanded((p) => !p)}
               className="flex w-full items-center justify-between text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1 px-2 hover:text-sidebar-foreground transition-colors"
             >
@@ -106,9 +107,8 @@ export function Sidebar({ collapsed, onToggleCollapse, mobileOpen, onMobileClose
           )}
           {(typesExpanded || collapsed) && (
             <nav className="space-y-0.5">
-              {mockItemTypes.map((type) => {
+              {sidebarData.itemTypes.map((type) => {
                 const Icon = ICON_MAP[type.icon];
-                const count = typeCounts[type.id] ?? 0;
                 return (
                   <Link
                     key={type.id}
@@ -124,7 +124,7 @@ export function Sidebar({ collapsed, onToggleCollapse, mobileOpen, onMobileClose
                     {!collapsed && (
                       <>
                         <span className="flex-1 capitalize">{type.name}</span>
-                        <span className="text-xs text-muted-foreground">{count}</span>
+                        <span className="text-xs text-muted-foreground">{type.count}</span>
                       </>
                     )}
                   </Link>
@@ -139,6 +139,7 @@ export function Sidebar({ collapsed, onToggleCollapse, mobileOpen, onMobileClose
           <div className="px-3 pt-2">
             <div className="h-px bg-border mb-3" />
             <button
+              type="button"
               onClick={() => setCollectionsExpanded((p) => !p)}
               className="flex w-full items-center justify-between text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2 hover:text-sidebar-foreground transition-colors"
             >
@@ -166,31 +167,42 @@ export function Sidebar({ collapsed, onToggleCollapse, mobileOpen, onMobileClose
                         >
                           <Star className="size-3.5 shrink-0 fill-yellow-400 text-yellow-400" />
                           <span className="flex-1 truncate">{col.name}</span>
-                          <span className="text-xs text-muted-foreground">{col.itemIds.length}</span>
+                          <span className="text-xs text-muted-foreground">{col.itemCount}</span>
                         </Link>
                       ))}
                     </nav>
                   </div>
                 )}
 
-                {/* Recent / All collections */}
+                {/* All collections */}
                 <div>
                   <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 mb-1">
                     All Collections
                   </p>
                   <nav className="space-y-0.5">
-                    {mockCollections.map((col) => (
+                    {sidebarData.collections.map((col) => (
                       <Link
                         key={col.id}
                         href={`/collections/${col.id}`}
                         onClick={onMobileClose}
                         className="flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
                       >
+                        <span
+                          className="size-2 rounded-full shrink-0"
+                          style={{ backgroundColor: col.dominantColor ?? "#6b7280" }}
+                        />
                         <span className="flex-1 truncate">{col.name}</span>
-                        <span className="text-xs text-muted-foreground">{col.itemIds.length}</span>
+                        <span className="text-xs text-muted-foreground">{col.itemCount}</span>
                       </Link>
                     ))}
                   </nav>
+                  <Link
+                    href="/collections"
+                    onClick={onMobileClose}
+                    className="mt-1 flex items-center px-2 py-1 text-xs text-muted-foreground hover:text-sidebar-foreground transition-colors"
+                  >
+                    View all collections →
+                  </Link>
                 </div>
               </div>
             )}

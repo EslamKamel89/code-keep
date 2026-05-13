@@ -1,6 +1,6 @@
 import { Package, FolderOpen, Star, Bookmark } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { mockCollections, mockItems } from "@/lib/mock-data";
+import { getDashboardStats } from "@/src/lib/db/items";
 
 interface Stat {
   label: string;
@@ -10,38 +10,41 @@ interface Stat {
   iconBg: string;
 }
 
-const stats: Stat[] = [
-  {
-    label: "Total Items",
-    value: mockItems.length,
-    icon: Package,
-    iconColor: "text-blue-400",
-    iconBg: "bg-blue-400/10",
-  },
-  {
-    label: "Collections",
-    value: mockCollections.length,
-    icon: FolderOpen,
-    iconColor: "text-purple-400",
-    iconBg: "bg-purple-400/10",
-  },
-  {
-    label: "Favorite Items",
-    value: mockItems.filter((i) => i.isFavorite).length,
-    icon: Star,
-    iconColor: "text-yellow-400",
-    iconBg: "bg-yellow-400/10",
-  },
-  {
-    label: "Favorite Collections",
-    value: mockCollections.filter((c) => c.isFavorite).length,
-    icon: Bookmark,
-    iconColor: "text-emerald-400",
-    iconBg: "bg-emerald-400/10",
-  },
-];
+export async function StatsCards() {
+  const { totalItems, totalCollections, favoriteItems, favoriteCollections } =
+    await getDashboardStats();
 
-export function StatsCards() {
+  const stats: Stat[] = [
+    {
+      label: "Total Items",
+      value: totalItems,
+      icon: Package,
+      iconColor: "text-blue-400",
+      iconBg: "bg-blue-400/10",
+    },
+    {
+      label: "Collections",
+      value: totalCollections,
+      icon: FolderOpen,
+      iconColor: "text-purple-400",
+      iconBg: "bg-purple-400/10",
+    },
+    {
+      label: "Favorite Items",
+      value: favoriteItems,
+      icon: Star,
+      iconColor: "text-yellow-400",
+      iconBg: "bg-yellow-400/10",
+    },
+    {
+      label: "Favorite Collections",
+      value: favoriteCollections,
+      icon: Bookmark,
+      iconColor: "text-emerald-400",
+      iconBg: "bg-emerald-400/10",
+    },
+  ];
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat) => {

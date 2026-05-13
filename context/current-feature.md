@@ -20,3 +20,5 @@
 - 2026-05-09: Seed data expansion completed — bcryptjs added, User.password field migrated, truncate-before-seed, demo user + 5 collections + 14 items seeded successfully
 - 2026-05-09: Dashboard collections real data started — replace mock collections with Prisma DB queries, border color from dominant type, type icons per collection
 - 2026-05-09: Dashboard collections real data completed — src/lib/db/collections.ts created, CollectionsGrid made async server component, CollectionCard updated with dominant-type border color and live type icons, build passing
+- 2026-05-13: Dashboard items real data started — replace mock pinned/recent items with Prisma DB queries, item card icon/border from item type, update collection stats
+- 2026-05-13: Dashboard items real data completed — src/lib/db/items.ts created, PinnedItems/RecentItems/StatsCards made async server components, ItemCard updated to use live itemType relation and DB tags, mock data removed from all item components, build passing

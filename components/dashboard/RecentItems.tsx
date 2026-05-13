@@ -1,11 +1,9 @@
 import { Clock } from "lucide-react";
 import { ItemCard } from "./ItemCard";
-import { mockItems } from "@/lib/mock-data";
+import { getRecentItems } from "@/src/lib/db/items";
 
-export function RecentItems() {
-  const recentItems = [...mockItems]
-    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-    .slice(0, 10);
+export async function RecentItems() {
+  const recentItems = await getRecentItems();
 
   return (
     <section>

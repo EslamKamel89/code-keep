@@ -42,6 +42,8 @@ interface SidebarProps {
 export function Sidebar({ collapsed, onToggleCollapse, mobileOpen, onMobileClose, sidebarData }: SidebarProps) {
   const [typesExpanded, setTypesExpanded] = useState(true);
   const [collectionsExpanded, setCollectionsExpanded] = useState(true);
+  const [favoritesExpanded, setFavoritesExpanded] = useState(true);
+  const [allCollectionsExpanded, setAllCollectionsExpanded] = useState(true);
 
   const favoriteCollections = sidebarData.collections.filter((c) => c.isFavorite);
 
@@ -90,7 +92,7 @@ export function Sidebar({ collapsed, onToggleCollapse, mobileOpen, onMobileClose
       </div>
 
       {/* Scrollable body */}
-      <div className="flex-1 overflow-y-auto py-3 space-y-1">
+      <div className="flex-1 overflow-y-auto py-3 space-y-1 sidebar-scroll">
         {/* Types section */}
         <div className="px-3">
           {!collapsed && (
@@ -150,14 +152,19 @@ export function Sidebar({ collapsed, onToggleCollapse, mobileOpen, onMobileClose
             </button>
 
             {collectionsExpanded && (
-              <div className="space-y-3">
+              <div className="ml-2 border-l border-border pl-2 space-y-3">
                 {/* Favorites */}
                 {favoriteCollections.length > 0 && (
                   <div>
-                    <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 mb-1">
-                      Favorites
-                    </p>
-                    <nav className="space-y-0.5">
+                    <button
+                      type="button"
+                      onClick={() => setFavoritesExpanded((p) => !p)}
+                      className="flex w-full items-center justify-between text-xs font-medium text-muted-foreground px-2 mb-1 hover:text-sidebar-foreground transition-colors"
+                    >
+                      <span>Favorites</span>
+                      <ChevronDown className={cn("size-3 transition-transform", !favoritesExpanded && "-rotate-90")} />
+                    </button>
+                    {favoritesExpanded && <nav className="space-y-0.5">
                       {favoriteCollections.map((col) => (
                         <Link
                           key={col.id}
@@ -170,15 +177,21 @@ export function Sidebar({ collapsed, onToggleCollapse, mobileOpen, onMobileClose
                           <span className="text-xs text-muted-foreground">{col.itemCount}</span>
                         </Link>
                       ))}
-                    </nav>
+                    </nav>}
                   </div>
                 )}
 
                 {/* All collections */}
                 <div>
-                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 mb-1">
-                    All Collections
-                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setAllCollectionsExpanded((p) => !p)}
+                    className="flex w-full items-center justify-between text-xs font-medium text-muted-foreground px-2 mb-1 hover:text-sidebar-foreground transition-colors"
+                  >
+                    <span>All Collections</span>
+                    <ChevronDown className={cn("size-3 transition-transform", !allCollectionsExpanded && "-rotate-90")} />
+                  </button>
+                  {allCollectionsExpanded && <>
                   <nav className="space-y-0.5">
                     {sidebarData.collections.map((col) => (
                       <Link
@@ -203,6 +216,7 @@ export function Sidebar({ collapsed, onToggleCollapse, mobileOpen, onMobileClose
                   >
                     View all collections →
                   </Link>
+                  </>}
                 </div>
               </div>
             )}

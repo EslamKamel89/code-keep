@@ -20,6 +20,9 @@ import type { LucideIcon } from "lucide-react";
 import { mockUser } from "@/lib/mock-data";
 import type { SidebarData } from "@/src/lib/db/sidebar";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+
+const PRO_TYPES = new Set(["file", "image"]);
 
 const ICON_MAP: Record<string, LucideIcon> = {
   Code,
@@ -126,6 +129,11 @@ export function Sidebar({ collapsed, onToggleCollapse, mobileOpen, onMobileClose
                     {!collapsed && (
                       <>
                         <span className="flex-1 capitalize">{type.name}</span>
+                        {PRO_TYPES.has(type.name) && (
+                          <Badge variant="outline" className="h-4 px-1 text-[10px] font-semibold text-muted-foreground border-muted-foreground/40">
+                            PRO
+                          </Badge>
+                        )}
                         <span className="text-xs text-muted-foreground">{type.count}</span>
                       </>
                     )}

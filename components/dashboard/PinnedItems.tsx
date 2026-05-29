@@ -1,4 +1,4 @@
-import { getPinnedItems } from "@/src/lib/db/items";
+import { getPinnedItems } from "@/lib/db/items";
 import { Pin } from "lucide-react";
 import { ItemCard } from "./ItemCard";
 

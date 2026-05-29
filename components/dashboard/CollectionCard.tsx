@@ -1,25 +1,7 @@
 import { Star, MoreHorizontal } from "lucide-react";
-import {
-  Code,
-  Sparkles,
-  Terminal,
-  StickyNote,
-  File as FileIcon,
-  Image as ImageIcon,
-  Link as LinkIcon,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-import type { RecentCollection } from "@/src/lib/db/collections";
-
-const ICON_MAP: Record<string, LucideIcon> = {
-  Code,
-  Sparkles,
-  Terminal,
-  StickyNote,
-  File: FileIcon,
-  Image: ImageIcon,
-  Link: LinkIcon,
-};
+import type { RecentCollection } from "@/lib/db/collections";
+import { ICON_MAP } from "@/lib/icon-map";
+import { computeDominantColor } from "@/lib/utils";
 
 interface CollectionCardProps {
   collection: RecentCollection;
@@ -27,17 +9,12 @@ interface CollectionCardProps {
 
 export function CollectionCard({ collection }: CollectionCardProps) {
   const typeMap = new Map<string, { id: string; name: string; icon: string; color: string }>();
-  const typeCounts = new Map<string, { count: number; color: string }>();
-
   for (const ic of collection.items) {
     const { itemType } = ic.item;
     typeMap.set(itemType.id, itemType);
-    const entry = typeCounts.get(itemType.id);
-    typeCounts.set(itemType.id, { count: (entry?.count ?? 0) + 1, color: itemType.color });
   }
-
   const uniqueTypes = [...typeMap.values()];
-  const dominantColor = [...typeCounts.values()].sort((a, b) => b.count - a.count)[0]?.color;
+  const dominantColor = computeDominantColor(collection.items);
 
   return (
     <div
@@ -53,7 +30,7 @@ export function CollectionCard({ collection }: CollectionCardProps) {
             )}
           </div>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {collection.items.length} {collection.items.length === 1 ? "item" : "items"}
+            {collection._count.items} {collection._count.items === 1 ? "item" : "items"}
           </p>
         </div>
         <button

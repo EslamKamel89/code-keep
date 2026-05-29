@@ -1,6 +1,6 @@
 import { Clock } from "lucide-react";
 import { ItemCard } from "./ItemCard";
-import { getRecentItems } from "@/src/lib/db/items";
+import { getRecentItems } from "@/lib/db/items";
 
 export async function RecentItems() {
   const recentItems = await getRecentItems();

@@ -1,23 +1,13 @@
+export const dynamic = "force-dynamic";
+
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { StatsCards } from "@/components/dashboard/StatsCards";
 import { CollectionsGrid } from "@/components/dashboard/CollectionsGrid";
 import { PinnedItems } from "@/components/dashboard/PinnedItems";
 import { RecentItems } from "@/components/dashboard/RecentItems";
-import { getSidebarItemTypes, getSidebarCollections } from "@/src/lib/db/sidebar";
-import type { SidebarData } from "@/src/lib/db/sidebar";
-
-function computeDominantColor(
-  items: { item: { itemType: { id: string; color: string } } }[]
-): string | null {
-  if (items.length === 0) return null;
-  const counts = new Map<string, { color: string; count: number }>();
-  for (const { item } of items) {
-    const { id, color } = item.itemType;
-    const entry = counts.get(id);
-    counts.set(id, { color, count: (entry?.count ?? 0) + 1 });
-  }
-  return [...counts.values()].sort((a, b) => b.count - a.count)[0].color;
-}
+import { getSidebarItemTypes, getSidebarCollections } from "@/lib/db/sidebar";
+import type { SidebarData } from "@/lib/db/sidebar";
+import { computeDominantColor } from "@/lib/utils";
 
 export default async function DashboardPage() {
   const [rawItemTypes, rawCollections] = await Promise.all([
@@ -37,7 +27,7 @@ export default async function DashboardPage() {
       id: col.id,
       name: col.name,
       isFavorite: col.isFavorite,
-      itemCount: col.items.length,
+      itemCount: col._count.items,
       dominantColor: computeDominantColor(col.items),
     })),
   };

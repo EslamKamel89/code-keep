@@ -2,32 +2,7 @@
 
 ## Status
 
-Completed
-
 ## Goals
-
-Fix code quality and performance issues identified in the code-scanner audit.
-
-### Critical
-
-- [ ] All DB queries are unscoped — deferred: requires NextAuth setup first
-
-### High
-
-- [x] **CollectionCard loads all items to count them** — `lib/db/collections.ts` uses `_count.items` for count + `take: 10` for icon items; `CollectionCard.tsx` updated to use `_count.items`
-- [x] **`getSidebarCollections` loads all items per collection** — `lib/db/sidebar.ts` adds `take: 20` + `_count` to nested items
-
-### Medium
-
-- [x] **`computeDominantColor` duplicated** — extracted to `lib/utils.ts`; removed from `page.tsx` and `CollectionCard.tsx`
-- [x] **`@/src/lib/db/` path inconsistency** — all DB files moved to `lib/db/`; `src/lib/db/` deleted; all imports updated
-- [x] **`ICON_MAP` duplicated** — extracted to `lib/icon-map.ts`; removed from `Sidebar.tsx`, `CollectionCard.tsx`, `ItemCard.tsx`
-- [x] **`getPinnedItems` has no row limit** — `take: 10` added to `lib/db/items.ts`
-- [x] **`formatDate` embedded in component** — moved to `lib/utils.ts`; removed from `ItemCard.tsx`
-
-### Bonus
-
-- [x] Added `export const dynamic = "force-dynamic"` to `/dashboard` page to prevent Neon WebSocket failures during static prerendering
 
 ## Notes
 
@@ -50,3 +25,4 @@ Fix code quality and performance issues identified in the code-scanner audit.
 - 2026-05-13: Stats & sidebar real data started — replace mock stats with DB queries, sidebar item types from DB with icon links, colored circles for recent collections based on dominant type, "View all collections" link
 - 2026-05-13: Stats & sidebar real data completed — src/lib/db/sidebar.ts created, getSidebarItemTypes/getSidebarCollections added, Sidebar migrated from mock data to DB props via DashboardShell, colored dots for all collections, "View all collections" link, build passing
 - 2026-05-17: Add Pro Badge to Sidebar completed — shadcn Badge installed, PRO badge (outline variant) added to Files and Images types in sidebar, hidden in collapsed mode, build passing
+- 2026-05-29: Code-scanner audit fixes completed — DB layer consolidated to lib/db/, ICON_MAP/computeDominantColor/formatDate extracted to shared libs, row limits added to getPinnedItems/getRecentCollections/getSidebarCollections, force-dynamic added to dashboard page, build passing

@@ -1,5 +1,5 @@
 import { CollectionCard } from "./CollectionCard";
-import { getRecentCollections } from "@/src/lib/db/collections";
+import { getRecentCollections } from "@/lib/db/collections";
 
 export async function CollectionsGrid() {
   const collections = await getRecentCollections();

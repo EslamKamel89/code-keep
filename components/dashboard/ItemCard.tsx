@@ -1,23 +1,5 @@
-import {
-  Code,
-  Sparkles,
-  Terminal,
-  StickyNote,
-  File as FileIcon,
-  Image as ImageIcon,
-  Link as LinkIcon,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-
-const ICON_MAP: Record<string, LucideIcon> = {
-  Code,
-  Sparkles,
-  Terminal,
-  StickyNote,
-  File: FileIcon,
-  Image: ImageIcon,
-  Link: LinkIcon,
-};
+import { ICON_MAP } from "@/lib/icon-map";
+import { formatDate } from "@/lib/utils";
 
 interface Item {
   id: string;
@@ -30,10 +12,6 @@ interface Item {
 
 interface ItemCardProps {
   item: Item;
-}
-
-function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date);
 }
 
 export function ItemCard({ item }: ItemCardProps) {

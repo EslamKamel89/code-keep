@@ -1,10 +1,16 @@
-import { db } from "@/src/lib/db";
+import { db } from "@/lib/db";
 
 export async function getRecentCollections() {
   return db.collection.findMany({
-    include: {
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      isFavorite: true,
+      _count: { select: { items: true } },
       items: {
-        include: {
+        take: 10,
+        select: {
           item: {
             select: {
               itemType: {

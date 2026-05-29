@@ -1,4 +1,4 @@
-import { db } from "@/src/lib/db";
+import { db } from "@/lib/db";
 
 export async function getSidebarItemTypes() {
   return db.itemType.findMany({
@@ -19,7 +19,9 @@ export async function getSidebarCollections() {
       id: true,
       name: true,
       isFavorite: true,
+      _count: { select: { items: true } },
       items: {
+        take: 20,
         select: {
           item: {
             select: {

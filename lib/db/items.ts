@@ -1,4 +1,4 @@
-import { db } from "@/src/lib/db";
+import { db } from "@/lib/db";
 
 export async function getPinnedItems() {
   return db.item.findMany({
@@ -8,6 +8,7 @@ export async function getPinnedItems() {
       tags: { include: { tag: { select: { name: true } } } },
     },
     orderBy: { updatedAt: "desc" },
+    take: 10,
   });
 }
 

@@ -1,6 +1,6 @@
 import { Package, FolderOpen, Star, Bookmark } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { getDashboardStats } from "@/src/lib/db/items";
+import { getDashboardStats } from "@/lib/db/items";
 
 interface Stat {
   label: string;
